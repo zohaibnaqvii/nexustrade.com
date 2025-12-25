@@ -1,0 +1,7 @@
+{
+  "name": "NexusTrade Markets",
+  "description": "Professional binary options trading platform with real-time TradingView charts, persistent user data via Firebase, and integrated crypto payment systems.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
