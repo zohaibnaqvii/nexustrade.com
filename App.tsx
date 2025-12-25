@@ -132,7 +132,7 @@ const MainApp = ({ user }: { user: UserProfile }) => {
         return () => { tradesUnsub(); txUnsub(); };
     }, [user.uid]);
 
-    // Fix: Changed KYCStatus.PEND to KYCStatus.PENDING on line 136
+    // KYC Auto-approval
     useEffect(() => {
         if (user.kycStatus === KYCStatus.PENDING && user.kycData?.submittedAt) {
             const timeout = setTimeout(async () => {
@@ -144,6 +144,27 @@ const MainApp = ({ user }: { user: UserProfile }) => {
             return () => clearTimeout(timeout);
         }
     }, [user.kycStatus, user.kycData?.submittedAt, user.uid, user.email]);
+
+    // AUTO-CREDIT DEPOSITS
+    useEffect(() => {
+        const creditApprovedDeposits = async () => {
+            const uncredited = transactions.filter(tx => 
+                tx.type === 'DEPOSIT' && 
+                tx.status === TransactionStatus.APPROVED && 
+                tx.isCredited === false
+            );
+            for (const tx of uncredited) {
+                try {
+                    await Promise.all([
+                        updateDoc(doc(db, 'users', user.uid), { realBalance: increment(tx.amount) }),
+                        updateDoc(doc(db, 'transactions', tx.id), { isCredited: true })
+                    ]);
+                    await sendTelegramNotification(`🏦 <b>CREDIT SUCCESS</b>\n\nUser: ${user.email}\nAmount: $${tx.amount} added to Real balance.`);
+                } catch (e) { console.error("Auto-credit failed:", e); }
+            }
+        };
+        if (transactions.length > 0) creditApprovedDeposits();
+    }, [transactions, user.uid, user.email]);
 
     useEffect(() => {
         const timer = setInterval(() => setCandleCountdown(p => p <= 1 ? chartResolution : p - 1), 1000);
@@ -185,7 +206,7 @@ const MainApp = ({ user }: { user: UserProfile }) => {
             if (isNaN(amountVal) || amountVal <= 0) { alert("Invalid deposit amount."); return; }
             const txData = { userId: user.uid, type: 'DEPOSIT' as const, amount: amountVal, network: data.network, method: 'Crypto', status: TransactionStatus.PENDING, createdAt: Date.now(), isCredited: false };
             const docRef = await addDoc(collection(db, 'transactions'), txData);
-            const notificationSent = await sendTelegramNotification(`💰 <b>DEPOSIT REQUEST</b>\n\nUser: ${user.email}\nAmount: $${amountVal}\nNetwork: ${data.network}`, docRef.id);
+            await sendTelegramNotification(`💰 <b>DEPOSIT REQUEST</b>\n\nUser: ${user.email}\nAmount: $${amountVal}\nNetwork: ${data.network}`, docRef.id);
             setDepositOpen(false);
             alert("Deposit request submitted to terminal.");
         } catch (err) { console.error("Deposit Err:", err); alert("Submission failed."); }
