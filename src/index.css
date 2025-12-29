@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  :root {
+    --background: 216 28% 7%;
+    --foreground: 0 0% 98%;
+
+    --card: 215 25% 9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 215 25% 11%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 142 71% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 20% 15%;
+    --secondary-foreground: 0 0% 85%;
+
+    --muted: 215 15% 20%;
+    --muted-foreground: 215 10% 50%;
+
+    --accent: 215 20% 18%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 15% 20%;
+    --input: 215 20% 15%;
+    --ring: 142 71% 45%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 216 28% 7%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 142 71% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 20% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 215 15% 20%;
+    --sidebar-ring: 142 71% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html, body, #root {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased overflow-hidden;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Hide scrollbars globally */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Prevent pull-to-refresh on mobile */
+html {
+  overscroll-behavior: none;
+}
+
+body {
+  overscroll-behavior: none;
+}
